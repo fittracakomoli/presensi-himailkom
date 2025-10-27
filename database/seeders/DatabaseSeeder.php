@@ -15,11 +15,20 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        // 1. Master data & authentication
+        $this->call(RoleSeeder::class);
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        // Create permissions and role-permission mappings
+        $this->call(PermissionSeeder::class);
+        $this->call(RolePermissionSeeder::class);
+
+        // Create Users
+        $this->call(UserSeeder::class);
+
+        // Create Members
+        $this->call(MemberSeeder::class);
+
+        // Create Events
+        $this->call(EventSeeder::class);
     }
 }

@@ -5,6 +5,18 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
+/*
+================
+MODULAR ROUTE LOADING
+================
+
+Load all route files from the "modules" directory to keep routes organized and modular.
+*/
+
+foreach (glob(__DIR__.'/modules/*.php') as $routeFile) {
+    require $routeFile;
+}
+
 Route::get('/', function () {
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
