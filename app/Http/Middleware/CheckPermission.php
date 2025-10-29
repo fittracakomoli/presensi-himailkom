@@ -23,7 +23,7 @@ class CheckPermission
 
         // Check apakah user punya permission yang dibutuhkan
         if (!$user->hasPermission($permission)) {
-            abort(403, 'You do not have pe rmission to access this resource.');
+            abort(403, 'You do not have permission to access this resource.');
         }
         return $next($request);
     }

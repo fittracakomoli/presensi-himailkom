@@ -19,9 +19,17 @@ export default function Navbar() {
             case "admin":
                 return [{ name: "Dashboard", route: "admin.dashboard" }];
             case "moderator":
-                return [{ name: "Dashboard", route: "moderator.dashboard" }];
+                return [
+                    { name: "Dashboard", route: "moderator.dashboard" },
+                    { name: "Program Kerja", route: "moderator.event.index" },
+                    { name: "Presensi", route: "moderator.attendance.index" },
+                ];
             case "member":
-                return [{ name: "Dashboard", route: "members.dashboard" }];
+                return [
+                    { name: "Dashboard", route: "member.dashboard" },
+                    { name: "Presensi", route: "member.attend.index" },
+                    { name: "Profile", route: "member.profile.edit" },
+                ];
             default:
                 return [];
         }
@@ -93,19 +101,9 @@ export default function Navbar() {
                                         </span>
                                     </div>
 
-                                    {role.toLowerCase() === "company" && (
+                                    {role.toLowerCase() === "member" && (
                                         <Dropdown.Link
-                                            href={route("company.profile.show")}
-                                        >
-                                            View Profile
-                                        </Dropdown.Link>
-                                    )}
-
-                                    {role.toLowerCase() === "jobseeker" && (
-                                        <Dropdown.Link
-                                            href={route(
-                                                "jobseeker.profile.show"
-                                            )}
+                                            href={route("member.profile.edit")}
                                         >
                                             View Profile
                                         </Dropdown.Link>

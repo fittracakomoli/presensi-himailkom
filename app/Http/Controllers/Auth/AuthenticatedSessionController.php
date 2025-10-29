@@ -51,7 +51,7 @@ class AuthenticatedSessionController extends Controller
 
         // JobSeeker
         if ($user->isMember()) {
-            return redirect()->intended(route('members.dashboard'));
+            return redirect()->intended(route('member.dashboard'));
         }
 
         // Fallback

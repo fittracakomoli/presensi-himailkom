@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\User;
 use App\Models\Committee;
+use App\Models\AttendanceDate;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -27,16 +28,16 @@ class Event extends Model
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'user_id');
     }
 
-    public function attendances(): HasMany
+    public function committee(): HasMany
     {
-        return $this->hasMany(Attendance::class);
+        return $this->hasMany(Committee::class, 'event_id');
     }
 
-    public function committees(): HasMany
+    public function attendanceDate(): HasMany
     {
-        return $this->hasMany(Committee::class);
+        return $this->hasMany(AttendanceDate::class, 'event_id');
     }
 }

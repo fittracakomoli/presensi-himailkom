@@ -39,7 +39,6 @@ class EventSeeder extends Seeder
                 'user_id' => $user->id,
                 'title' => $eventTitle[$i],
                 'description' => $faker->paragraph(),
-                'datetime' => $faker->dateTimeBetween('-1 month', '+2 months'),
                 'location' => $eventLocation[$i],
                 'created_at' => Carbon::now()->subDays(rand(1, 20)),
                 'updated_at' => Carbon::now()->subDays(rand(1, 20)),

@@ -1,0 +1,374 @@
+import React, { useState } from "react";
+import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
+import { Head, useForm, Link } from "@inertiajs/react";
+
+export default function Index({ events, attendanceDates }) {
+    const [showModal, setShowModal] = useState(false);
+    const [openEventId, setOpenEventId] = useState(null);
+
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [editingId, setEditingId] = useState(null);
+
+    const { data, setData, post, processing, errors, reset } = useForm({
+        name: "",
+        date: "",
+    });
+
+    const editForm = useForm({
+        name: "",
+        date: "",
+    });
+
+    function openModal(eventId) {
+        setOpenEventId(eventId);
+        setShowModal(true);
+        reset();
+    }
+
+    function closeModal() {
+        setOpenEventId(null);
+        setShowModal(false);
+        reset();
+    }
+
+    function submit(e) {
+        e.preventDefault();
+        if (!openEventId) return;
+        post(route("moderator.attendance.store", openEventId), {
+            onSuccess: () => {
+                closeModal();
+            },
+        });
+    }
+
+    // open edit modal for a specific attendance record
+    function openEditModal(eventId, attendance) {
+        setOpenEventId(eventId);
+        setEditingId(attendance.id);
+        editForm.setData("name", attendance.name || "");
+        editForm.setData(
+            "date",
+            attendance.date ? attendance.date.split(" ")[0] : ""
+        ); // ensure YYYY-MM-DD
+        setShowEditModal(true);
+    }
+
+    function closeEditModal() {
+        setEditingId(null);
+        setOpenEventId(null);
+        editForm.reset();
+        setShowEditModal(false);
+    }
+
+    function submitEdit(e) {
+        e.preventDefault();
+        if (!openEventId || !editingId) return;
+        editForm.put(
+            route("moderator.attendance.update", [openEventId, editingId]),
+            {
+                onSuccess: () => closeEditModal(),
+            }
+        );
+    }
+
+    // helper: get attendance list for an event
+    function getAttendanceListForEvent(ev) {
+        if (Array.isArray(attendanceDates) && attendanceDates.length > 0) {
+            return attendanceDates.filter(
+                (ad) => String(ad.event_id) === String(ev.id)
+            );
+        }
+        if (Array.isArray(ev.attendanceDates)) return ev.attendanceDates;
+        return [];
+    }
+
+    return (
+        <AuthenticatedLayout
+            header={
+                <h2 className="text-xl font-semibold leading-tight text-gray-800">
+                    Attendance Dates
+                </h2>
+            }
+        >
+            <Head title="Event Attendance Dates" />
+
+            <div className="py-12">
+                <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
+                    <div className="grid gap-6">
+                        {!events || events.length === 0 ? (
+                            <div className="rounded-lg bg-white p-6 shadow">
+                                <p className="text-sm text-gray-500">
+                                    No events available.
+                                </p>
+                            </div>
+                        ) : (
+                            events.map((ev) => {
+                                const list = getAttendanceListForEvent(ev);
+                                return (
+                                    <div
+                                        key={ev.id}
+                                        className="rounded-lg bg-white p-6 shadow"
+                                    >
+                                        <div className="flex justify-between items-center">
+                                            <div>
+                                                <h3 className="text-lg font-semibold text-gray-900">
+                                                    {ev.title}
+                                                </h3>
+                                                <div className="text-sm text-gray-500">
+                                                    {ev.location ?? "-"}
+                                                </div>
+                                            </div>
+
+                                            <div className="flex items-center gap-2">
+                                                <button
+                                                    type="button"
+                                                    onClick={() =>
+                                                        openModal(ev.id)
+                                                    }
+                                                    className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700"
+                                                >
+                                                    + Add Attendance Date
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <div className="mt-4">
+                                            <h4 className="text-sm font-medium text-gray-700 mb-2">
+                                                Attendance Dates
+                                            </h4>
+
+                                            {list.length === 0 ? (
+                                                <div className="text-sm text-gray-500">
+                                                    No attendance dates.
+                                                </div>
+                                            ) : (
+                                                <ul className="space-y-2">
+                                                    {list.map((ad) => (
+                                                        <li
+                                                            key={ad.id}
+                                                            className="flex items-center justify-between bg-gray-50 p-3 rounded"
+                                                        >
+                                                            <div>
+                                                                <div className="text-sm font-medium text-gray-900">
+                                                                    {ad.name ??
+                                                                        "-"}
+                                                                </div>
+                                                                <div className="text-xs text-gray-500">
+                                                                    {ad.date
+                                                                        ? new Date(
+                                                                              ad.date
+                                                                          ).toLocaleDateString()
+                                                                        : "-"}
+                                                                </div>
+                                                            </div>
+                                                            <div className="flex items-center gap-2">
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() =>
+                                                                        openEditModal(
+                                                                            ev.id,
+                                                                            ad
+                                                                        )
+                                                                    }
+                                                                    className="text-xs px-3 py-2 border border-yellow-600 text-yellow-700 rounded hover:bg-yellow-100"
+                                                                >
+                                                                    Edit
+                                                                </button>
+                                                                <Link
+                                                                    href={route(
+                                                                        "moderator.attendance.destroy",
+                                                                        [
+                                                                            ev.id,
+                                                                            ad.id,
+                                                                        ]
+                                                                    )}
+                                                                    method="delete"
+                                                                    as="button"
+                                                                    onClick={(
+                                                                        e
+                                                                    ) => {
+                                                                        if (
+                                                                            !confirm(
+                                                                                "Yakin ingin menghapus attendance date ini?"
+                                                                            )
+                                                                        ) {
+                                                                            e.preventDefault();
+                                                                        }
+                                                                    }}
+                                                                    className="text-xs px-3 py-2 border border-red-600 text-red-600 rounded hover:bg-red-100"
+                                                                >
+                                                                    Hapus
+                                                                </Link>
+                                                                <Link
+                                                                    href={route(
+                                                                        "moderator.attendance.show",
+                                                                        ad.id
+                                                                    )}
+                                                                    className="text-xs px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                                                                >
+                                                                    Lihat
+                                                                    Presensi
+                                                                </Link>
+                                                            </div>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            )}
+                                        </div>
+                                    </div>
+                                );
+                            })
+                        )}
+                    </div>
+                </div>
+            </div>
+
+            {showModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center">
+                    <div
+                        className="fixed inset-0 bg-black/50"
+                        onClick={closeModal}
+                    />
+                    <div className="relative z-10 w-full max-w-md bg-white rounded-lg shadow-lg p-6">
+                        <h3 className="text-lg font-medium text-gray-900 mb-4">
+                            Add Attendance Date
+                        </h3>
+
+                        <form onSubmit={submit} className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">
+                                    Keterangan
+                                </label>
+                                <input
+                                    type="text"
+                                    value={data.name}
+                                    onChange={(e) =>
+                                        setData("name", e.target.value)
+                                    }
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                    placeholder="e.g. Hari ke 1 / Sesi 1"
+                                    required
+                                />
+                                {errors.name && (
+                                    <div className="text-red-600 text-sm mt-1">
+                                        {errors.name}
+                                    </div>
+                                )}
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">
+                                    Tanggal Presensi
+                                </label>
+                                <input
+                                    type="date"
+                                    value={data.date}
+                                    onChange={(e) =>
+                                        setData("date", e.target.value)
+                                    }
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                    required
+                                />
+                                {errors.date && (
+                                    <div className="text-red-600 text-sm mt-1">
+                                        {errors.date}
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="flex justify-end gap-2 mt-2">
+                                <button
+                                    type="button"
+                                    onClick={closeModal}
+                                    className="px-3 py-2 bg-gray-100 rounded hover:bg-gray-200"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={processing}
+                                    className="px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                                >
+                                    Save
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {showEditModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center">
+                    <div
+                        className="fixed inset-0 bg-black/50"
+                        onClick={closeEditModal}
+                    />
+                    <div className="relative z-10 w-full max-w-md bg-white rounded-lg shadow-lg p-6">
+                        <h3 className="text-lg font-medium text-gray-900 mb-4">
+                            Edit Attendance Date
+                        </h3>
+
+                        <form onSubmit={submitEdit} className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">
+                                    Keterangan
+                                </label>
+                                <input
+                                    type="text"
+                                    value={editForm.data.name}
+                                    onChange={(e) =>
+                                        editForm.setData("name", e.target.value)
+                                    }
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                    required
+                                />
+                                {editForm.errors.name && (
+                                    <div className="text-red-600 text-sm mt-1">
+                                        {editForm.errors.name}
+                                    </div>
+                                )}
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">
+                                    Tanggal Presensi
+                                </label>
+                                <input
+                                    type="date"
+                                    value={editForm.data.date}
+                                    onChange={(e) =>
+                                        editForm.setData("date", e.target.value)
+                                    }
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                    required
+                                />
+                                {editForm.errors.date && (
+                                    <div className="text-red-600 text-sm mt-1">
+                                        {editForm.errors.date}
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="flex justify-end gap-2 mt-2">
+                                <button
+                                    type="button"
+                                    onClick={closeEditModal}
+                                    className="px-3 py-2 bg-gray-100 rounded hover:bg-gray-200"
+                                >
+                                    Batal
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={editForm.processing}
+                                    className="px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                                >
+                                    Simpan
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+        </AuthenticatedLayout>
+    );
+}
