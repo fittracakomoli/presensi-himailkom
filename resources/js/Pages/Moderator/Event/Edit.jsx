@@ -20,12 +20,12 @@ export default function Edit({ event }) {
     return (
         <AuthenticatedLayout
             header={
-                <h2 className="text-xl font-semibold leading-tight text-gray-800">
-                    Create Event
+                <h2 className="text-xl font-semibold leading-tight text-primary">
+                    Edit Event
                 </h2>
             }
         >
-            <Head title="Create Event" />
+            <Head title="Edit Event" />
 
             <div className="py-12">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
@@ -92,7 +92,7 @@ export default function Edit({ event }) {
                                 </PrimaryButton>
                                 <Link
                                     href={route("moderator.event.index")}
-                                    className="px-3 py-2 border rounded text-gray-700"
+                                    className="text-xs items-center rounded-md border border-gray-600 px-4 py-2 font-semibold uppercase tracking-widest text-gray-600 transition duration-150 ease-in-out hover:bg-gray-400 focus:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 active:bg-gray-900"
                                 >
                                     Cancel
                                 </Link>

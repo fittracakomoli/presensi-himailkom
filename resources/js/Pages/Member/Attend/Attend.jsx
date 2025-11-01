@@ -2,6 +2,7 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head } from "@inertiajs/react";
 import { useEffect, useRef, useState } from "react";
 import { Html5Qrcode } from "html5-qrcode";
+import PrimaryButton from "@/Components/PrimaryButton";
 
 export default function Dashboard() {
     const qrRegionId = "html5qr-code-full-region";
@@ -157,7 +158,7 @@ export default function Dashboard() {
     return (
         <AuthenticatedLayout
             header={
-                <h2 className="text-xl font-semibold leading-tight text-gray-800">
+                <h2 className="text-xl font-semibold leading-tight text-primary">
                     Presensi
                 </h2>
             }
@@ -169,16 +170,15 @@ export default function Dashboard() {
                     <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
                         <div className="p-6 text-gray-900">
                             <div className="mb-2 flex gap-2">
-                                <button
+                                <PrimaryButton
                                     type="button"
                                     onClick={() => {
                                         listCameras();
                                         startScanner();
                                     }}
-                                    className="px-3 py-2 bg-blue-600 text-white rounded"
                                 >
                                     Mulai Scan QR
-                                </button>
+                                </PrimaryButton>
 
                                 <button
                                     type="button"
@@ -189,13 +189,14 @@ export default function Dashboard() {
                                     Stop
                                 </button>
 
-                                <button
+                                <PrimaryButton
                                     type="button"
-                                    onClick={listCameras}
-                                    className="px-3 py-2 bg-indigo-600 text-white rounded"
+                                    onClick={() => {
+                                        listCameras();
+                                    }}
                                 >
-                                    Refresh Kamera
-                                </button>
+                                    Refresh
+                                </PrimaryButton>
                             </div>
 
                             {cameraList.length > 0 && (

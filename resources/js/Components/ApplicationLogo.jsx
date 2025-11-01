@@ -4,8 +4,6 @@ export default function ApplicationLogo(props) {
             <svg
                 xmlns="http://www.w3.org/2000/svg"
                 {...props}
-                width="full"
-                height="full"
                 viewBox="0 0 2000 2000"
             >
                 <path

@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import QRCode from "qrcode";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Head } from "@inertiajs/react";
+import { Head, Link } from "@inertiajs/react";
 import { useForm } from "@inertiajs/react";
 
 function AttendanceRow({ a }) {
@@ -86,7 +86,7 @@ function AttendanceRow({ a }) {
                         value={form.data.note}
                         onChange={handleNoteChange}
                         onKeyDown={handleNoteKeyDown}
-                        className="w-48 rounded border-gray-300"
+                        className="w-full rounded border-gray-300"
                         placeholder="catatan (opsional) — tekan Enter untuk simpan"
                     />
 
@@ -107,8 +107,7 @@ export default function Show({ attendance, attendanceDate, token }) {
     // generate QR hanya di client supaya tidak terganggu SSR
     const [qrImageSrc, setQrImageSrc] = useState(null);
     const [qrLink, setQrLink] = useState(null);
-
-    console.log(token);
+    const [showQr, setShowQr] = useState(false); // <-- tombol toggle
 
     useEffect(() => {
         if (!attendanceDate?.id) {
@@ -130,86 +129,129 @@ export default function Show({ attendance, attendanceDate, token }) {
     return (
         <AuthenticatedLayout
             header={
-                <h2 className="text-xl font-semibold">
-                    Presensi {attendanceDate?.event?.title ?? "Semua Presensi"}
-                    {" - "}
-                    {attendanceDate?.name ?? ""}
+                <h2 className="text-xl font-semibold text-primary">
+                    Data Presensi
                 </h2>
             }
         >
-            <Head title="Semua Presensi" />
+            <Head
+                title={`Presensi ${
+                    attendanceDate?.event?.title ?? "Semua Presensi"
+                } -
+                    ${attendanceDate?.name ?? ""}`}
+            />
 
-            <div className="py-8 max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div className="py-6 max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <div className="flex items-center justify-end mb-4">
+                    {/* Tombol toggle QR */}
+                    <button
+                        type="button"
+                        onClick={() => setShowQr((s) => !s)}
+                        className="text-xs items-center rounded-md border border-transparent bg-gray-200 px-4 py-2 font-semibold uppercase tracking-widest text-gray-800 transition duration-150 ease-in-out hover:bg-gray-300 me-2"
+                    >
+                        {showQr ? "Sembunyikan QR" : "Tampilkan QR"}
+                    </button>
                     {/* Tombol export Word */}
-                    <a
+                    <Link
                         href={`/moderator/attendances/${attendanceDate?.id}/export`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+                        className="text-xs items-center rounded-md border border-transparent bg-primary px-4 py-2 font-semibold uppercase tracking-widest text-white transition duration-150 ease-in-out hover:bg-secondary focus:bg-secondary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 active:bg-gray-900"
                     >
                         Export Word
-                    </a>
+                    </Link>
                 </div>
 
                 {/* QR Presensi (ditampilkan untuk discan oleh anggota) */}
-                <div className="mb-6 bg-white shadow rounded-lg p-4 flex items-center space-x-6">
-                    <div>
-                        <h3 className="font-medium text-sm">
-                            QR Presensi (scan oleh anggota)
-                        </h3>
-                        {qrImageSrc ? (
-                            <div className="mt-2">
-                                <img
-                                    src={qrImageSrc}
-                                    alt="QR Presensi"
-                                    className="w-full h-full bg-white rounded shadow"
-                                />
-                                <div className="text-xs text-gray-500 mt-1 break-words w-80">
-                                    {qrLink}
+                {showQr ? (
+                    <div className="mb-6 bg-white shadow rounded-lg p-4 flex items-start space-x-6">
+                        <div>
+                            {qrImageSrc ? (
+                                <div className="mt-2">
+                                    <img
+                                        src={qrImageSrc}
+                                        alt="QR Presensi"
+                                        className="w-full h-full bg-white rounded shadow"
+                                    />
                                 </div>
-                            </div>
-                        ) : (
-                            <div className="text-sm text-gray-500 mt-2">
-                                Tidak ada data tanggal presensi.
-                            </div>
-                        )}
-                    </div>
+                            ) : (
+                                <div className="text-sm text-gray-500 mt-2">
+                                    Tidak ada data tanggal presensi.
+                                </div>
+                            )}
+                        </div>
 
-                    <div className="text-sm text-gray-600">
-                        Petunjuk singkat:
-                        <ul className="list-disc ml-5 mt-2">
-                            <li>
-                                Tunjukkan QR ini ke anggota untuk dipindai dari
-                                halaman anggota.
-                            </li>
-                            <li>
-                                QR berisi link presensi untuk tanggal ini;
-                                anggota akan mengirimkan informasi committee_id
-                                saat melakukan scan dari halaman anggota.
-                            </li>
-                            <li>
-                                Pemetaan committee_id vs attendance akan
-                                dilakukan di endpoint anggota nanti.
-                            </li>
-                        </ul>
+                        <div className="text-sm text-gray-600">
+                            <div className="py-6">
+                                <h2 className="text-3xl font-semibold text-primary">
+                                    Presensi{" "}
+                                    {attendanceDate?.event?.title ??
+                                        "Semua Presensi"}
+                                    {" - "}
+                                    {attendanceDate?.name ?? ""}
+                                </h2>
+                                <p className="mt-2 text-base text-gray-500">
+                                    {attendanceDate.datetime
+                                        ? new Date(
+                                              attendanceDate.datetime
+                                          ).toLocaleString("id-ID") + " WIB"
+                                        : ""}
+                                </p>
+                            </div>
+                            <div>
+                                <h4 className="text-base">Petunjuk singkat:</h4>
+                                <ul className="list-disc ml-5 mt-2 text-base">
+                                    <li>
+                                        Kode QR ditampilkan untuk di scan oleh
+                                        anggota yang tergabung dalam
+                                        kepanitiaan.
+                                    </li>
+                                    <li>
+                                        Anggota login ke dalam akun
+                                        masing-masing untuk scan kode QR ini
+                                        untuk melakukan presensi.
+                                    </li>
+                                    <li>
+                                        Setelah scan kode QR berhasil status
+                                        kehadiran akan otomatis diperbarui
+                                        disertai dengan waktu presensi.
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
-                </div>
+                ) : (
+                    <div className="mb-6 bg-white shadow rounded-lg p-4">
+                        <h2 className="text-xl font-semibold text-primary">
+                            Presensi{" "}
+                            {attendanceDate?.event?.title ?? "Semua Presensi"}
+                            {" - "}
+                            {attendanceDate?.name ?? ""}
+                        </h2>
+                        <p className="mt-2 text-sm text-gray-500">
+                            {attendanceDate.datetime
+                                ? new Date(
+                                      attendanceDate.datetime
+                                  ).toLocaleString("id-ID") + " WIB"
+                                : ""}
+                        </p>
+                    </div>
+                )}
 
                 <div className="bg-white shadow rounded-lg overflow-x-auto">
                     <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50">
+                        <thead className="bg-primary">
                             <tr>
-                                <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">
+                                <th className="px-4 py-2 text-left text-sm font-medium text-white">
                                     Nama
                                 </th>
-                                <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">
+                                <th className="px-4 py-2 text-left text-sm font-medium text-white">
                                     Sie
                                 </th>
-                                <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">
-                                    Status / Note / Aksi
+                                <th className="px-4 py-2 text-left text-sm font-medium text-white">
+                                    Status Kehadiran
                                 </th>
-                                <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">
+                                <th className="px-4 py-2 text-left text-sm font-medium text-white">
                                     Waktu Presensi
                                 </th>
                             </tr>

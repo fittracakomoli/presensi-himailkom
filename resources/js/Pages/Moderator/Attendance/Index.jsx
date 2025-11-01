@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, useForm, Link } from "@inertiajs/react";
+import PrimaryButton from "@/Components/PrimaryButton";
 
 export default function Index({ events, attendanceDates }) {
     const [showModal, setShowModal] = useState(false);
@@ -85,7 +86,7 @@ export default function Index({ events, attendanceDates }) {
     return (
         <AuthenticatedLayout
             header={
-                <h2 className="text-xl font-semibold leading-tight text-gray-800">
+                <h2 className="text-xl font-semibold leading-tight text-primary">
                     Attendance Dates
                 </h2>
             }
@@ -111,7 +112,7 @@ export default function Index({ events, attendanceDates }) {
                                     >
                                         <div className="flex justify-between items-center">
                                             <div>
-                                                <h3 className="text-lg font-semibold text-gray-900">
+                                                <h3 className="text-lg font-semibold text-primary">
                                                     {ev.title}
                                                 </h3>
                                                 <div className="text-sm text-gray-500">
@@ -120,26 +121,25 @@ export default function Index({ events, attendanceDates }) {
                                             </div>
 
                                             <div className="flex items-center gap-2">
-                                                <button
+                                                <PrimaryButton
                                                     type="button"
                                                     onClick={() =>
                                                         openModal(ev.id)
                                                     }
-                                                    className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700"
                                                 >
-                                                    + Add Attendance Date
-                                                </button>
+                                                    + Tambah Presensi
+                                                </PrimaryButton>
                                             </div>
                                         </div>
 
                                         <div className="mt-4">
                                             <h4 className="text-sm font-medium text-gray-700 mb-2">
-                                                Attendance Dates
+                                                Daftar Presensi
                                             </h4>
 
                                             {list.length === 0 ? (
                                                 <div className="text-sm text-gray-500">
-                                                    No attendance dates.
+                                                    Tidak ada presensi.
                                                 </div>
                                             ) : (
                                                 <ul className="space-y-2">
@@ -149,7 +149,7 @@ export default function Index({ events, attendanceDates }) {
                                                             className="flex items-center justify-between bg-gray-50 p-3 rounded"
                                                         >
                                                             <div>
-                                                                <div className="text-sm font-medium text-gray-900">
+                                                                <div className="text-sm font-medium text-primary">
                                                                     {ad.name ??
                                                                         "-"}
                                                                 </div>
@@ -170,7 +170,7 @@ export default function Index({ events, attendanceDates }) {
                                                                             ad
                                                                         )
                                                                     }
-                                                                    className="text-xs px-3 py-2 border border-yellow-600 text-yellow-700 rounded hover:bg-yellow-100"
+                                                                    className="text-xs items-center rounded-md border border-primary px-4 py-2 font-semibold uppercase tracking-widest text-primary transition duration-150 ease-in-out hover:bg-secondary focus:bg-secondary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 active:bg-gray-900"
                                                                 >
                                                                     Edit
                                                                 </button>
@@ -195,7 +195,7 @@ export default function Index({ events, attendanceDates }) {
                                                                             e.preventDefault();
                                                                         }
                                                                     }}
-                                                                    className="text-xs px-3 py-2 border border-red-600 text-red-600 rounded hover:bg-red-100"
+                                                                    className="text-xs items-center rounded-md border border-transparent bg-red-600 px-4 py-2 font-semibold uppercase tracking-widest text-white transition duration-150 ease-in-out hover:bg-red-400 focus:bg-red-400 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 active:bg-gray-900"
                                                                 >
                                                                     Hapus
                                                                 </Link>
@@ -204,7 +204,7 @@ export default function Index({ events, attendanceDates }) {
                                                                         "moderator.attendance.show",
                                                                         ad.id
                                                                     )}
-                                                                    className="text-xs px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                                                                    className="text-xs items-center rounded-md border border-transparent bg-primary px-4 py-2 font-semibold uppercase tracking-widest text-white transition duration-150 ease-in-out hover:bg-secondary focus:bg-secondary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 active:bg-gray-900"
                                                                 >
                                                                     Lihat
                                                                     Presensi
@@ -230,8 +230,8 @@ export default function Index({ events, attendanceDates }) {
                         onClick={closeModal}
                     />
                     <div className="relative z-10 w-full max-w-md bg-white rounded-lg shadow-lg p-6">
-                        <h3 className="text-lg font-medium text-gray-900 mb-4">
-                            Add Attendance Date
+                        <h3 className="text-lg font-medium text-primary mb-4">
+                            Tambah Presensi
                         </h3>
 
                         <form onSubmit={submit} className="space-y-4">
@@ -280,17 +280,16 @@ export default function Index({ events, attendanceDates }) {
                                 <button
                                     type="button"
                                     onClick={closeModal}
-                                    className="px-3 py-2 bg-gray-100 rounded hover:bg-gray-200"
+                                    className="text-xs items-center rounded-md border border-gray-600 px-4 py-2 font-semibold uppercase tracking-widest text-gray-600 transition duration-150 ease-in-out hover:bg-gray-400 focus:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 active:bg-gray-900"
                                 >
                                     Cancel
                                 </button>
-                                <button
+                                <PrimaryButton
                                     type="submit"
                                     disabled={processing}
-                                    className="px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
                                 >
-                                    Save
-                                </button>
+                                    Simpan
+                                </PrimaryButton>
                             </div>
                         </form>
                     </div>
@@ -304,8 +303,8 @@ export default function Index({ events, attendanceDates }) {
                         onClick={closeEditModal}
                     />
                     <div className="relative z-10 w-full max-w-md bg-white rounded-lg shadow-lg p-6">
-                        <h3 className="text-lg font-medium text-gray-900 mb-4">
-                            Edit Attendance Date
+                        <h3 className="text-lg font-medium text-primary mb-4">
+                            Edit Presensi
                         </h3>
 
                         <form onSubmit={submitEdit} className="space-y-4">
@@ -356,17 +355,16 @@ export default function Index({ events, attendanceDates }) {
                                 <button
                                     type="button"
                                     onClick={closeEditModal}
-                                    className="px-3 py-2 bg-gray-100 rounded hover:bg-gray-200"
+                                    className="text-xs items-center rounded-md border border-gray-600 px-4 py-2 font-semibold uppercase tracking-widest text-gray-600 transition duration-150 ease-in-out hover:bg-gray-400 focus:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 active:bg-gray-900"
                                 >
                                     Batal
                                 </button>
-                                <button
+                                <PrimaryButton
                                     type="submit"
                                     disabled={editForm.processing}
-                                    className="px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
                                 >
                                     Simpan
-                                </button>
+                                </PrimaryButton>
                             </div>
                         </form>
                     </div>

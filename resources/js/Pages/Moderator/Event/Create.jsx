@@ -20,7 +20,7 @@ export default function Create() {
     return (
         <AuthenticatedLayout
             header={
-                <h2 className="text-xl font-semibold leading-tight text-gray-800">
+                <h2 className="text-xl font-semibold leading-tight text-primary">
                     Create Event
                 </h2>
             }
@@ -92,7 +92,7 @@ export default function Create() {
                                 </PrimaryButton>
                                 <Link
                                     href={route("moderator.event.index")}
-                                    className="px-3 py-2 border rounded text-gray-700"
+                                    className="text-xs items-center rounded-md border border-gray-600 px-4 py-2 font-semibold uppercase tracking-widest text-gray-600 transition duration-150 ease-in-out hover:bg-gray-400 focus:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 active:bg-gray-900"
                                 >
                                     Cancel
                                 </Link>

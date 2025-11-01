@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, Link, useForm } from "@inertiajs/react";
+import PrimaryButton from "@/Components/PrimaryButton";
 
 export default function Index({ events, committees, committeeCount, members }) {
     const [showModal, setShowModal] = useState(false);
@@ -83,7 +84,7 @@ export default function Index({ events, committees, committeeCount, members }) {
     return (
         <AuthenticatedLayout
             header={
-                <h2 className="text-xl font-semibold leading-tight text-gray-800">
+                <h2 className="text-xl font-semibold leading-tight text-primary">
                     Susunan Kepanitiaan
                 </h2>
             }
@@ -94,62 +95,58 @@ export default function Index({ events, committees, committeeCount, members }) {
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
                     <div className="bg-white p-6 flex gap-6 items-center justify-between shadow sm:rounded-lg mb-6">
                         <div>
-                            <h3 className="text-3xl font-semibold text-gray-900">
+                            <h3 className="text-3xl font-semibold text-primary">
                                 {events?.title}
                             </h3>
-                            <p className="text-gray-500 text-sm mt-2    ">
+                            <p className="text-gray-500 text-sm mt-2">
                                 {events.description}
                             </p>
                         </div>
                         <div className="flex items-center justify-center">
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
-                                className="w-6 h-6 text-blue-600"
+                                className="w-6 h-6 text-secondary"
                                 viewBox="0 -960 960 960"
                                 fill="currentColor"
                             >
                                 <path d="M480-480q33 0 56.5-23.5T560-560q0-33-23.5-56.5T480-640q-33 0-56.5 23.5T400-560q0 33 23.5 56.5T480-480Zm0 294q122-112 181-203.5T720-552q0-109-69.5-178.5T480-800q-101 0-170.5 69.5T240-552q0 71 59 162.5T480-186Zm0 106Q319-217 239.5-334.5T160-552q0-150 96.5-239T480-880q127 0 223.5 89T800-552q0 100-79.5 217.5T480-80Zm0-480Z" />
                             </svg>
-                            <span className="ml-2 text-blue-600 font-medium">
+                            <span className="ml-2 text-secondary font-medium">
                                 {events.location}
                             </span>
                         </div>
                     </div>
 
-                    <div className="flex items-center justify-between mb-2">
-                        <div className="font-semibold text-xl">
+                    <div className="flex items-center justify-between mb-4">
+                        <div className="font-medium text-lg text-gray-700">
                             {committeeCount} Panitia
                         </div>
-                        <button
-                            type="button"
-                            onClick={openModal}
-                            className="mb-4 inline-block bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition"
-                        >
+                        <PrimaryButton type="button" onClick={openModal}>
                             Tambah Panitia
-                        </button>
+                        </PrimaryButton>
                     </div>
 
                     {/* Table */}
                     <div className="bg-white shadow sm:rounded-lg overflow-x-auto">
                         <table className="min-w-full divide-y divide-gray-200">
-                            <thead className="bg-gray-50">
+                            <thead className="bg-primary">
                                 <tr>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
                                         No
                                     </th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
                                         Nama
                                     </th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
                                         NIM
                                     </th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
                                         Divisi
                                     </th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
                                         Sie
                                     </th>
-                                    <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th className="px-6 py-3 text-center text-xs font-medium text-white uppercase tracking-wider">
                                         Aksi
                                     </th>
                                 </tr>
@@ -186,15 +183,14 @@ export default function Index({ events, committees, committeeCount, members }) {
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-center">
                                                 <div className="inline-flex gap-2">
-                                                    <button
+                                                    <PrimaryButton
                                                         type="button"
                                                         onClick={() =>
                                                             openEditModal(c)
                                                         }
-                                                        className="px-3 py-1 text-sm bg-yellow-50 text-yellow-700 rounded hover:bg-yellow-100"
                                                     >
                                                         Edit
-                                                    </button>
+                                                    </PrimaryButton>
 
                                                     <Link
                                                         href={route(
@@ -212,7 +208,7 @@ export default function Index({ events, committees, committeeCount, members }) {
                                                                 ev.preventDefault();
                                                             }
                                                         }}
-                                                        className="px-3 py-1 text-sm bg-red-50 text-red-700 rounded hover:bg-red-100"
+                                                        className="text-xs items-center rounded-md border border-transparent bg-red-600 px-4 py-2 font-semibold uppercase tracking-widest text-white transition duration-150 ease-in-out hover:bg-red-400 focus:bg-red-400 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 active:bg-gray-900"
                                                     >
                                                         Hapus
                                                     </Link>
@@ -234,7 +230,7 @@ export default function Index({ events, committees, committeeCount, members }) {
                         onClick={closeModal}
                     />
                     <div className="relative z-10 w-full max-w-md bg-white rounded-lg shadow-lg p-6">
-                        <h3 className="text-lg font-medium text-gray-900 mb-4">
+                        <h3 className="text-lg font-medium text-primary mb-4">
                             Tambah Panitia
                         </h3>
 
@@ -297,17 +293,16 @@ export default function Index({ events, committees, committeeCount, members }) {
                                 <button
                                     type="button"
                                     onClick={closeModal}
-                                    className="px-3 py-2 bg-gray-100 rounded hover:bg-gray-200"
+                                    className="text-xs items-center rounded-md border border-gray-600 px-4 py-2 font-semibold uppercase tracking-widest text-gray-600 transition duration-150 ease-in-out hover:bg-gray-400 focus:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 active:bg-gray-900"
                                 >
                                     Batal
                                 </button>
-                                <button
+                                <PrimaryButton
                                     type="submit"
                                     disabled={processing}
-                                    className="px-3 py-2 bg-green-600 text-white rounded hover:bg-green-700"
                                 >
                                     Tambah
-                                </button>
+                                </PrimaryButton>
                             </div>
                         </form>
                     </div>
@@ -369,17 +364,16 @@ export default function Index({ events, committees, committeeCount, members }) {
                                 <button
                                     type="button"
                                     onClick={closeEditModal}
-                                    className="px-3 py-2 bg-gray-100 rounded hover:bg-gray-200"
+                                    className="text-xs items-center rounded-md border border-gray-600 px-4 py-2 font-semibold uppercase tracking-widest text-gray-600 transition duration-150 ease-in-out hover:bg-gray-400 focus:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 active:bg-gray-900"
                                 >
                                     Batal
                                 </button>
-                                <button
+                                <PrimaryButton
                                     type="submit"
                                     disabled={editForm.processing}
-                                    className="px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
                                 >
                                     Simpan
-                                </button>
+                                </PrimaryButton>
                             </div>
                         </form>
                     </div>

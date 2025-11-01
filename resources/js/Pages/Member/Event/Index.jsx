@@ -5,14 +5,18 @@ import { Head, Link } from "@inertiajs/react";
 export default function Index({ attendanceDate, member }) {
     return (
         <AuthenticatedLayout
-            header={<h2 className="text-xl font-semibold">Program Kerja</h2>}
+            header={
+                <h2 className="text-xl font-semibold leading-tight text-primary">
+                    Program Kerja
+                </h2>
+            }
         >
             <Head title="Presensi Saya" />
 
-            <div className="py-8 max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div className="py-8 max-w-7xl mx-auto px-6 lg:px-8">
                 <div className="bg-white shadow rounded-lg p-4">
                     <div className="mb-4">
-                        <h3 className="text-lg font-medium">
+                        <h3 className="text-lg font-medium text-primary">
                             {member?.name ?? "Member"}
                         </h3>
                         <p className="text-sm text-gray-500">
@@ -32,7 +36,7 @@ export default function Index({ attendanceDate, member }) {
                                     className="border border-gray-200 rounded p-3 flex justify-between items-center"
                                 >
                                     <div>
-                                        <div className="font-semibold">
+                                        <div className="font-semibold text-primary">
                                             {d.event?.title ?? "-"} -{" "}
                                             {d.name ?? "-"}
                                         </div>
@@ -41,7 +45,7 @@ export default function Index({ attendanceDate, member }) {
                                             {d.datetime
                                                 ? new Date(
                                                       d.datetime
-                                                  ).toLocaleString()
+                                                  ).toLocaleString("id-ID")
                                                 : "-"}
                                         </div>
                                         {d.sie_label && (

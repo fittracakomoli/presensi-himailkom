@@ -80,19 +80,19 @@ export default function ProfileMember({ user, member }) {
     return (
         <AuthenticatedLayout
             header={
-                <h2 className="text-xl font-semibold leading-tight text-gray-800">
-                    Profile
+                <h2 className="text-xl font-semibold leading-tight text-primary">
+                    Profile Settings
                 </h2>
             }
         >
             <Head title="Profile" />
 
             <div className="py-12">
-                <div className="mx-auto max-w-7xl space-y-6 sm:px-6 lg:px-8">
-                    <div className="bg-white p-4 shadow sm:rounded-lg sm:p-8">
+                <div className="mx-auto max-w-7xl space-y-6 px-6 lg:px-8">
+                    <div className="bg-white p-4 shadow rounded-lg sm:p-8">
                         <section>
                             <header>
-                                <h2 className="text-lg font-medium text-gray-900">
+                                <h2 className="text-lg font-medium text-primary">
                                     Credential Information
                                 </h2>
                                 <p className="mt-1 text-sm text-gray-600">
@@ -164,7 +164,7 @@ export default function ProfileMember({ user, member }) {
                     <div className="bg-white p-4 shadow sm:rounded-lg sm:p-8">
                         <section>
                             <header>
-                                <h2 className="text-lg font-medium text-gray-900">
+                                <h2 className="text-lg font-medium text-primary">
                                     Profile Information
                                 </h2>
                                 <p className="mt-1 text-sm text-gray-600">
@@ -193,7 +193,6 @@ export default function ProfileMember({ user, member }) {
                                             )
                                         }
                                         required
-                                        isFocused
                                         autoComplete="name"
                                     />
                                     <InputError
@@ -212,7 +211,6 @@ export default function ProfileMember({ user, member }) {
                                             setData("nim", e.target.value)
                                         }
                                         required
-                                        isFocused
                                         autoComplete="nim"
                                     />
                                     <InputError
@@ -269,7 +267,7 @@ export default function ProfileMember({ user, member }) {
                     <div className="bg-white p-4 shadow sm:rounded-lg sm:p-8">
                         <section>
                             <header>
-                                <h2 className="text-lg font-medium text-gray-900">
+                                <h2 className="text-lg font-medium text-primary">
                                     Update Password
                                 </h2>
                                 <p className="mt-1 text-sm text-gray-600">
