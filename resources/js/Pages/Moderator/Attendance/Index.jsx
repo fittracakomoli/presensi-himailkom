@@ -11,12 +11,12 @@ export default function Index({ events, attendanceDates }) {
 
     const { data, setData, post, processing, errors, reset } = useForm({
         name: "",
-        date: "",
+        datetime: "",
     });
 
     const editForm = useForm({
         name: "",
-        date: "",
+        datetime: "",
     });
 
     function openModal(eventId) {
@@ -47,9 +47,9 @@ export default function Index({ events, attendanceDates }) {
         setEditingId(attendance.id);
         editForm.setData("name", attendance.name || "");
         editForm.setData(
-            "date",
-            attendance.date ? attendance.date.split(" ")[0] : ""
-        ); // ensure YYYY-MM-DD
+            "datetime",
+            attendance.datetime ? attendance.datetime.split(" ")[1] : ""
+        ); // ensure HH:MM
         setShowEditModal(true);
     }
 
@@ -154,10 +154,10 @@ export default function Index({ events, attendanceDates }) {
                                                                         "-"}
                                                                 </div>
                                                                 <div className="text-xs text-gray-500">
-                                                                    {ad.date
+                                                                    {ad.datetime
                                                                         ? new Date(
-                                                                              ad.date
-                                                                          ).toLocaleDateString()
+                                                                              ad.datetime
+                                                                          ).toLocaleString()
                                                                         : "-"}
                                                                 </div>
                                                             </div>
@@ -261,17 +261,17 @@ export default function Index({ events, attendanceDates }) {
                                     Tanggal Presensi
                                 </label>
                                 <input
-                                    type="date"
-                                    value={data.date}
+                                    type="datetime-local"
+                                    value={data.datetime}
                                     onChange={(e) =>
-                                        setData("date", e.target.value)
+                                        setData("datetime", e.target.value)
                                     }
                                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                                     required
                                 />
-                                {errors.date && (
+                                {errors.datetime && (
                                     <div className="text-red-600 text-sm mt-1">
-                                        {errors.date}
+                                        {errors.datetime}
                                     </div>
                                 )}
                             </div>
@@ -334,17 +334,20 @@ export default function Index({ events, attendanceDates }) {
                                     Tanggal Presensi
                                 </label>
                                 <input
-                                    type="date"
-                                    value={editForm.data.date}
+                                    type="datetime-local"
+                                    value={editForm.data.datetime}
                                     onChange={(e) =>
-                                        editForm.setData("date", e.target.value)
+                                        editForm.setData(
+                                            "datetime",
+                                            e.target.value
+                                        )
                                     }
                                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                                     required
                                 />
-                                {editForm.errors.date && (
+                                {editForm.errors.datetime && (
                                     <div className="text-red-600 text-sm mt-1">
-                                        {editForm.errors.date}
+                                        {editForm.errors.datetime}
                                     </div>
                                 )}
                             </div>

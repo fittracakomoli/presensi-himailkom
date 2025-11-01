@@ -3,6 +3,7 @@
 
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Member\AttendController;
 use App\Http\Controllers\Member\ProfileController;
 use App\Http\Controllers\Moderator\AttendanceController;
 
@@ -16,8 +17,8 @@ Route::middleware('auth', 'check.permission:member')->group(function () {
     Route::patch('member/member/update', [ProfileController::class, 'updateMember'])->name('member.member.update');
     Route::put('member/password/update', [ProfileController::class, 'password'])->name('member.password.update');
 
-    // Halaman yang dibuka dari QR: /member/attend?attendance_date_id=...
-    Route::get('member/attend', [AttendanceController::class, 'index'])->name('member.attend.index');
-    // Submit kehadiran
-    Route::post('member/attend', [AttendanceController::class, 'store'])->name('member.attend.store');
+    // Halaman yang dibuka dari QR: /member/event?attendance_date_id=...
+    Route::get('member/event', [AttendanceController::class, 'index'])->name('member.event.index');
+    Route::get('member/attend', [AttendController::class, 'index'])->name('member.attend.index');
+    Route::post('member/attend', [AttendController::class, 'attend'])->name('member.attend.store');
 });

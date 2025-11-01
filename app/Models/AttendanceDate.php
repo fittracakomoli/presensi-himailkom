@@ -17,11 +17,11 @@ class AttendanceDate extends Model
     protected $fillable = [
         'event_id',
         'name',
-        'date',
+        'datetime',
     ];
 
     protected $dates = [
-        'date',
+        'datetime',
     ];
 
     public function event(): BelongsTo

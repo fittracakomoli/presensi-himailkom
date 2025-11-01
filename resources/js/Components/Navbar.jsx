@@ -27,6 +27,7 @@ export default function Navbar() {
             case "member":
                 return [
                     { name: "Dashboard", route: "member.dashboard" },
+                    { name: "Program Kerja", route: "member.event.index" },
                     { name: "Presensi", route: "member.attend.index" },
                     { name: "Profile", route: "member.profile.edit" },
                 ];

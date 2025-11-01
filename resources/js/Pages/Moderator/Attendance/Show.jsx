@@ -7,8 +7,8 @@ import { useForm } from "@inertiajs/react";
 
 function AttendanceRow({ a }) {
     const form = useForm({
-        status: a.status ?? "absent",
-        note: a.note ?? "",
+        status: a.status,
+        note: a.note,
     });
 
     function submit(e) {
@@ -103,10 +103,12 @@ function AttendanceRow({ a }) {
     );
 }
 
-export default function Show({ attendance, attendanceDate }) {
+export default function Show({ attendance, attendanceDate, token }) {
     // generate QR hanya di client supaya tidak terganggu SSR
     const [qrImageSrc, setQrImageSrc] = useState(null);
     const [qrLink, setQrLink] = useState(null);
+
+    console.log(token);
 
     useEffect(() => {
         if (!attendanceDate?.id) {
@@ -114,8 +116,7 @@ export default function Show({ attendance, attendanceDate }) {
             setQrLink(null);
             return;
         }
-        const baseUrl = window.location.origin;
-        const link = `${baseUrl}/member/attend?attendance_date_id=${attendanceDate.id}`;
+        const link = token;
         setQrLink(link);
         // generate dataURL image (no external request)
         QRCode.toDataURL(link, { width: 320 })
@@ -162,7 +163,7 @@ export default function Show({ attendance, attendanceDate }) {
                                 <img
                                     src={qrImageSrc}
                                     alt="QR Presensi"
-                                    className="w-40 h-40 bg-white rounded shadow"
+                                    className="w-full h-full bg-white rounded shadow"
                                 />
                                 <div className="text-xs text-gray-500 mt-1 break-words w-80">
                                     {qrLink}

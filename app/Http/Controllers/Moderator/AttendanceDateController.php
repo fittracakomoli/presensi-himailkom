@@ -46,7 +46,7 @@ class AttendanceDateController extends Controller
     {
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'date' => ['required', 'date'],
+            'datetime' => ['required', 'date'],
         ]);
 
         $event = Event::findOrFail($eventId);
@@ -56,7 +56,7 @@ class AttendanceDateController extends Controller
             $attendanceDate = AttendanceDate::create([
                 'event_id' => $event->id,
                 'name' => $request->input('name'),
-                'date' => $request->input('date'),
+                'datetime' => $request->input('datetime'),
             ]);
 
             // load all committees for this event

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Moderator;
 use Carbon\Carbon;
 use Inertia\Inertia;
 use App\Models\Event;
+use App\Models\Member;
 use App\Models\Committee;
 use App\Models\Attendance;
 use Illuminate\Http\Request;
@@ -16,6 +17,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Redirect;
 
 class AttendanceController extends Controller
@@ -23,23 +25,18 @@ class AttendanceController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function index()
     {
-        $attendanceDateId = $request->query('attendance_date_id');
-        if (! $attendanceDateId) {
-            return Redirect::back()->with('error', 'Tanggal presensi tidak diberikan.');
-        }
+        $user = Auth::user();
+        $member = Member::with('user')->where('user_id', $user->id)->firstOrFail();
+        $attendanceDate = AttendanceDate::with('event')
+            ->whereHas('event.committee', function ($query) use ($member) {
+                $query->where('member_id', $member->id);
+            })->get();
 
-        $attendanceDate = AttendanceDate::with('event')->findOrFail($attendanceDateId);
-
-        // Ambil daftar committee milik member untuk event ini
-        $committees = Committee::where('event_id', $attendanceDate->event_id)
-            ->where('member_id', Auth::id())
-            ->get();
-
-        return Inertia::render('Member/Attend/Attend', [
+        return Inertia::render('Member/Event/Index', [
             'attendanceDate' => $attendanceDate,
-            'committees' => $committees,
+            'member' => $member,
         ]);
     }
 
@@ -48,7 +45,7 @@ class AttendanceController extends Controller
      */
     public function create()
     {
-        //
+        // 
     }
 
     /**
@@ -56,59 +53,7 @@ class AttendanceController extends Controller
      */
     public function store(Request $request)
     {
-        $data = $request->validate([
-            'attendance_date_id' => ['required', 'integer'],
-            'committee_id' => ['required', 'integer'],
-        ]);
-
-        $attendanceDate = AttendanceDate::findOrFail($data['attendance_date_id']);
-        $committee = Committee::findOrFail($data['committee_id']);
-
-        // Validasi kepemilikan & event cocok
-        if ($committee->member_id !== Auth::id() || $committee->event_id !== $attendanceDate->event_id) {
-            if ($request->wantsJson()) {
-                return response()->json(['success' => false, 'message' => 'Committee tidak valid untuk akun ini atau event.'], 403);
-            }
-            return Redirect::back()->with('error', 'Committee tidak valid untuk akun ini atau event.');
-        }
-
-        // Cari atau buat attendance record (idempotent)
-        $attendance = Attendance::where('attendance_date_id', $attendanceDate->id)
-            ->where('committee_id', $committee->id)
-            ->first();
-
-        // Jika sudah tercatat hadir, kembalikan sukses tapi beri tahu sudah terdaftar
-        if ($attendance && $attendance->status === 'present') {
-            $msg = 'Anda sudah tercatat hadir.';
-            if ($request->wantsJson()) {
-                return response()->json(['success' => true, 'message' => $msg, 'attendance' => $attendance], 200);
-            }
-            return Redirect::route('member.attend.index', ['attendance_date_id' => $attendanceDate->id])
-                ->with('success', $msg);
-        }
-
-        // Buat atau update record
-        if (! $attendance) {
-            $attendance = new Attendance();
-            $attendance->attendance_date_id = $attendanceDate->id;
-            $attendance->committee_id = $committee->id;
-        }
-
-        $attendance->status = 'present';
-        // set checked_in_at hanya jika belum ada untuk mempertahankan waktu awal check-in
-        if (empty($attendance->checked_in_at)) {
-            $attendance->checked_in_at = Carbon::now();
-        }
-        $attendance->save();
-
-        $msg = 'Presensi berhasil dicatat. Terima kasih.';
-
-        if ($request->wantsJson()) {
-            return response()->json(['success' => true, 'message' => $msg, 'attendance' => $attendance], 200);
-        }
-
-        return Redirect::route('member.attend.index', ['attendance_date_id' => $attendanceDate->id])
-            ->with('success', $msg);
+        // 
     }
 
     /**
@@ -124,9 +69,12 @@ class AttendanceController extends Controller
         // juga kirim data attendance date untuk judul / info
         $attendanceDate = AttendanceDate::with('event')->findOrFail($attendanceDateId);
 
+        $token = Crypt::encryptString($attendanceDateId);
+
         return Inertia::render('Moderator/Attendance/Show', [
             'attendance' => $attendance,
             'attendanceDate' => $attendanceDate,
+            'token' => $token,
         ]);
     }
 
