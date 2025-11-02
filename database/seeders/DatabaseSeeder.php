@@ -27,8 +27,5 @@ class DatabaseSeeder extends Seeder
 
         // Create Members
         $this->call(MemberSeeder::class);
-
-        // Create Events
-        $this->call(EventSeeder::class);
     }
 }
