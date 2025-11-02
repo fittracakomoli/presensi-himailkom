@@ -19,6 +19,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Redirect;
+use PhpOffice\PhpWord\TemplateProcessor;
 
 class AttendanceController extends Controller
 {
@@ -120,7 +121,6 @@ class AttendanceController extends Controller
      */
     public function export(string $attendanceDateId)
     {
-        // pastikan tidak timeout untuk export besar
         if (function_exists('set_time_limit')) {
             set_time_limit(0);
         }
@@ -131,44 +131,42 @@ class AttendanceController extends Controller
             ->where('attendance_date_id', $attendanceDateId)
             ->get();
 
-        $phpWord = new PhpWord();
-        $section = $phpWord->addSection();
-        $section->addTitle("Presensi - " . ($attendanceDate->name ?? $attendanceDate->date), 1);
-        $section->addText("Program Kerja: " . ($attendanceDate->event->title ?? '-'));
-        $section->addTextBreak(1);
-
-        $tableStyle = [
-            'borderSize' => 6,
-            'borderColor' => '999999',
-            'cellMargin' => 80,
-        ];
-        $firstRowStyle = ['bgColor' => 'f2f2f2'];
-        $phpWord->addTableStyle('PresensiTable', $tableStyle, $firstRowStyle);
-
-        $table = $section->addTable('PresensiTable');
-        // header
-        $table->addRow();
-        $table->addCell(3000)->addText('Nama');
-        $table->addCell(2000)->addText('Sie');
-        $table->addCell(1500)->addText('Status');
-        $table->addCell(4000)->addText('Note');
-        $table->addCell(2500)->addText('Waktu Presensi');
-
-        foreach ($attendances as $a) {
-            $table->addRow();
-            $table->addCell(3000)->addText($a->committee->member->name ?? '-');
-            $table->addCell(2000)->addText($a->committee->sie_label ?? '-');
-            $table->addCell(1500)->addText($a->status_label ?? '-');
-            $table->addCell(4000)->addText($a->note ?? '-');
-            $table->addCell(2500)->addText($a->checked_in_at ? ($a->checked_in_at . ' WIB') : '-');
+        // path ke template yang dibuat di langkah sebelumnya
+        $templatePath = resource_path('templates/template-presensi.docx');
+        if (!file_exists($templatePath)) {
+            abort(500, 'Template presensi tidak ditemukan. Buat file: resources/templates/template-presensi.docx');
         }
 
-        $filename = 'presensi_' . ($attendanceDate->event->title) . '_' . ($attendanceDate->name ?? '') . '_' . now()->format('Ymd_His') . '.docx';
+        $template = new TemplateProcessor($templatePath);
 
-        // simpan ke temp file lalu download (lebih stabil dibanding streaming langsung)
+        // header / title
+        $template->setValue('event', $attendanceDate->event->title ?? '-');
+        $template->setValue('date', $attendanceDate->datetime . ' WIB' ?? '-');
+        $template->setValue('location', $attendanceDate->event->location ?? '-');
+
+        $count = $attendances->count();
+        if ($count > 0) {
+            // clone row berdasarkan placeholder 'no' (atau salah satu placeholder pada baris)
+            $template->cloneRow('no', $count);
+
+            $i = 1;
+            foreach ($attendances as $a) {
+                $template->setValue("no#{$i}", $i);
+                $template->setValue("nama#{$i}", $a->committee->member->name ?? '-');
+                $template->setValue("sie#{$i}", $a->committee->sie_label ?? '-');
+                $template->setValue("status#{$i}", $a->status_label ?? '-');
+                $template->setValue("time#{$i}", $a->checked_in_at ? ($a->checked_in_at . ' WIB') : '-');
+                $i++;
+            }
+        } else {
+            // tidak ada data — kosongkan placeholder
+            $template->setValue('no', '');
+        }
+
+        $filename = 'presensi_' . ($attendanceDate->event->title ?: 'event') . '_' . ($attendanceDate->name ?? '') . '_' . now()->format('Ymd_His') . '.docx';
+
         $tempFile = tempnam(sys_get_temp_dir(), 'phpword') . '.docx';
-        $writer = IOFactory::createWriter($phpWord, 'Word2007');
-        $writer->save($tempFile);
+        $template->saveAs($tempFile);
 
         return response()->download($tempFile, $filename, [
             'Content-Type' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',

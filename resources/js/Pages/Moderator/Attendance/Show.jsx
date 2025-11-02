@@ -152,14 +152,17 @@ export default function Show({ attendance, attendanceDate, token }) {
                         {showQr ? "Sembunyikan QR" : "Tampilkan QR"}
                     </button>
                     {/* Tombol export Word */}
-                    <Link
-                        href={`/moderator/attendances/${attendanceDate?.id}/export`}
+                    <a
+                        href={route(
+                            "moderator.attendance.export",
+                            attendanceDate?.id
+                        )}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-xs items-center rounded-md border border-transparent bg-primary px-4 py-2 font-semibold uppercase tracking-widest text-white transition duration-150 ease-in-out hover:bg-secondary focus:bg-secondary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 active:bg-gray-900"
                     >
                         Export Word
-                    </Link>
+                    </a>
                 </div>
 
                 {/* QR Presensi (ditampilkan untuk discan oleh anggota) */}
@@ -183,7 +186,7 @@ export default function Show({ attendance, attendanceDate, token }) {
 
                         <div className="text-sm text-gray-600">
                             <div className="py-6">
-                                <h2 className="text-3xl font-semibold text-primary">
+                                <h2 className="text-2xl font-semibold text-primary">
                                     Presensi{" "}
                                     {attendanceDate?.event?.title ??
                                         "Semua Presensi"}
