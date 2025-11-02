@@ -31,16 +31,19 @@ export default function Dashboard() {
         };
     }, []);
 
-    const listCameras = () => {
-        Html5Qrcode.getCameras()
+    const listCameras = async () => {
+        // kembalikan promise sehingga caller bisa .then(...)
+        return Html5Qrcode.getCameras()
             .then((cameras) => {
                 setCameraList(cameras || []);
                 if (cameras && cameras.length > 0 && !selectedCameraId) {
                     setSelectedCameraId(cameras[0].deviceId || cameras[0].id);
                 }
+                return cameras;
             })
             .catch((err) => {
                 console.error("Error listing cameras", err);
+                throw err;
             });
     };
 
@@ -107,6 +110,15 @@ export default function Dashboard() {
         if (scanning) return;
 
         try {
+            // pastikan scanner lama sudah dihentikan
+            if (scannerRef.current) {
+                await scannerRef.current.stop().catch(() => {});
+                try {
+                    scannerRef.current.clear();
+                } catch {}
+                scannerRef.current = null;
+            }
+
             const html5QrCode = new Html5Qrcode(qrRegionId);
             scannerRef.current = html5QrCode;
 
@@ -121,21 +133,77 @@ export default function Dashboard() {
                 ? cameraId
                 : { facingMode: "environment" };
 
-            await html5QrCode.start(
-                cameraArg, // sekarang selalu ada argumen valid
-                { fps: 10, qrbox: 300 },
-                (decodedText /*, decodedResult */) => {
-                    setLastResult(decodedText);
-                    // stop kamera segera agar tidak membaca ulang
-                    stopScanner();
-                    // kirim token ke controller
-                    sendTokenToController(decodedText);
-                },
-                (errorMessage) => {
-                    // optional: console.debug(errorMessage);
+            const startOptions = { fps: 10, qrbox: 300 };
+
+            try {
+                await html5QrCode.start(
+                    cameraArg,
+                    startOptions,
+                    (decodedText /*, decodedResult */) => {
+                        setLastResult(decodedText);
+                        stopScanner();
+                        sendTokenToController(decodedText);
+                    },
+                    (errorMessage) => {
+                        // optional: console.debug(errorMessage);
+                    }
+                );
+                setScanning(true);
+            } catch (startErr) {
+                console.error("Failed to start scanner", startErr);
+
+                // jika NotReadableError atau kamera sibuk, coba fallback facingMode
+                const name = startErr && (startErr.name || "");
+                const msg = (startErr && startErr.message) || "";
+
+                if (
+                    name === "NotReadableError" ||
+                    msg.includes("Could not start video source") ||
+                    msg.includes("NotReadableError")
+                ) {
+                    console.warn(
+                        "Camera busy or not readable — mencoba fallback facingMode in 500ms"
+                    );
+                    // coba fallback setelah delay singkat
+                    await new Promise((r) => setTimeout(r, 500));
+                    try {
+                        await html5QrCode.start(
+                            { facingMode: "environment" },
+                            startOptions,
+                            (decodedText) => {
+                                setLastResult(decodedText);
+                                stopScanner();
+                                sendTokenToController(decodedText);
+                            },
+                            (errorMessage) => {}
+                        );
+                        setScanning(true);
+                        return;
+                    } catch (fallbackErr) {
+                        console.error(
+                            "Fallback start also failed",
+                            fallbackErr
+                        );
+                        try {
+                            await html5QrCode.stop();
+                        } catch {}
+                        try {
+                            html5QrCode.clear();
+                        } catch {}
+                        scannerRef.current = null;
+                        return;
+                    }
                 }
-            );
-            setScanning(true);
+
+                // untuk error lain, bersihkan scannerRef
+                try {
+                    await html5QrCode.stop();
+                } catch {}
+                try {
+                    html5QrCode.clear();
+                } catch {}
+                scannerRef.current = null;
+            }
         } catch (err) {
             console.error("Failed to start scanner", err);
         }
@@ -219,7 +287,7 @@ export default function Dashboard() {
                                     >
                                         {cameraList.map((cam) => (
                                             <option
-                                                key={cam.id}
+                                                key={cam.deviceId || cam.id}
                                                 value={cam.deviceId || cam.id}
                                             >
                                                 {cam.label ||
