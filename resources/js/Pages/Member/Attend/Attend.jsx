@@ -36,7 +36,7 @@ export default function Dashboard() {
             .then((cameras) => {
                 setCameraList(cameras || []);
                 if (cameras && cameras.length > 0 && !selectedCameraId) {
-                    setSelectedCameraId(cameras[0].id);
+                    setSelectedCameraId(cameras[0].deviceId || cameras[0].id);
                 }
             })
             .catch((err) => {
@@ -105,20 +105,24 @@ export default function Dashboard() {
 
     const startScanner = async () => {
         if (scanning) return;
+
         try {
             const html5QrCode = new Html5Qrcode(qrRegionId);
             scannerRef.current = html5QrCode;
 
             // pilih cameraId jika tersedia, jika tidak gunakan facingMode fallback
             const cameraId =
-                selectedCameraId || (cameraList[0] && cameraList[0].id) || null;
+                selectedCameraId ||
+                (cameraList[0] &&
+                    (cameraList[0].deviceId || cameraList[0].id)) ||
+                null;
+
             const cameraArg = cameraId
                 ? cameraId
                 : { facingMode: "environment" };
 
             await html5QrCode.start(
                 cameraArg, // sekarang selalu ada argumen valid
-                { facingMode: "environment" },
                 { fps: 10, qrbox: 300 },
                 (decodedText /*, decodedResult */) => {
                     setLastResult(decodedText);
@@ -174,8 +178,9 @@ export default function Dashboard() {
                                 <PrimaryButton
                                     type="button"
                                     onClick={() => {
-                                        listCameras();
-                                        startScanner();
+                                        listCameras().then(() =>
+                                            startScanner()
+                                        );
                                     }}
                                 >
                                     Mulai Scan QR
@@ -213,8 +218,13 @@ export default function Dashboard() {
                                         className="mt-1 border rounded"
                                     >
                                         {cameraList.map((cam) => (
-                                            <option key={cam.id} value={cam.id}>
-                                                {cam.label || cam.id}
+                                            <option
+                                                key={cam.id}
+                                                value={cam.deviceId || cam.id}
+                                            >
+                                                {cam.label ||
+                                                    cam.deviceId ||
+                                                    cam.id}
                                             </option>
                                         ))}
                                     </select>
