@@ -7,6 +7,7 @@ export default function Dashboard() {
     const qrRegionId = "html5qr-code-full-region";
     const [sending, setSending] = useState(false);
     const [responseMessage, setResponseMessage] = useState(null);
+    const [responseOk, setResponseOk] = useState(null);
     const [scanData, setScanData] = useState(null); // <-- added to hold attendance data
 
     // New: kirim token ke controller Laravel
@@ -19,6 +20,7 @@ export default function Dashboard() {
         try {
             setSending(true);
             setResponseMessage(null);
+            setResponseOk(null);
             setScanData(null);
 
             const res = await fetch(url, {
@@ -30,6 +32,8 @@ export default function Dashboard() {
                 },
                 body: JSON.stringify({ token }),
             });
+
+            setResponseOk(res.ok);
 
             const ct = res.headers.get("content-type") || "";
 
@@ -61,6 +65,7 @@ export default function Dashboard() {
                 );
             }
         } catch (err) {
+            setResponseOk(false);
             console.error("Failed to send token", err);
             setResponseMessage("Gagal mengirim token");
         } finally {
@@ -104,7 +109,13 @@ export default function Dashboard() {
                                         Mengirim token...
                                     </div>
                                 ) : responseMessage ? (
-                                    <div className="text-sm text-green-600">
+                                    <div
+                                        className={
+                                            responseOk
+                                                ? "text-sm text-green-600"
+                                                : "text-sm text-red-600"
+                                        }
+                                    >
                                         {responseMessage}
                                     </div>
                                 ) : null}
