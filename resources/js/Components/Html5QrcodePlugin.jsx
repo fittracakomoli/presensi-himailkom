@@ -1,4 +1,4 @@
-// file = Html5QrcodePlugin.jsx
+// ...existing code...
 import { Html5QrcodeScanner } from "html5-qrcode";
 import { useEffect } from "react";
 
@@ -27,7 +27,7 @@ const Html5QrcodePlugin = (props) => {
         // when component mounts
         const config = createConfig(props);
         const verbose = props.verbose === true;
-        // Suceess callback is required.
+        // Success callback is required.
         if (!props.qrCodeSuccessCallback) {
             throw "qrCodeSuccessCallback is required callback.";
         }
@@ -36,20 +36,43 @@ const Html5QrcodePlugin = (props) => {
             config,
             verbose
         );
+
+        // wrap success callback: stop/clear scanner first, then call user callback
+        const wrappedSuccessCallback = async (decodedText, decodedResult) => {
+            try {
+                // clear() akan menghentikan video kamera dan membersihkan UI
+                await html5QrcodeScanner.clear();
+            } catch (err) {
+                console.error(
+                    "Failed to clear html5QrcodeScanner after success:",
+                    err
+                );
+            }
+            try {
+                props.qrCodeSuccessCallback(decodedText, decodedResult);
+            } catch (cbErr) {
+                console.error("qrCodeSuccessCallback threw:", cbErr);
+            }
+        };
+
         html5QrcodeScanner.render(
-            props.qrCodeSuccessCallback,
+            wrappedSuccessCallback,
             props.qrCodeErrorCallback
         );
 
         // cleanup function when component will unmount
         return () => {
             html5QrcodeScanner.clear().catch((error) => {
-                console.error("Failed to clear html5QrcodeScanner. ", error);
+                console.error(
+                    "Failed to clear html5QrcodeScanner on unmount. ",
+                    error
+                );
             });
         };
-    }, []);
+    }, []); // keep mount-only
 
     return <div id={qrcodeRegionId} />;
 };
 
 export default Html5QrcodePlugin;
+// ...existing code...
