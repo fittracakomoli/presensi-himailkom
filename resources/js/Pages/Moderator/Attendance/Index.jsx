@@ -43,13 +43,15 @@ export default function Index({ events, attendanceDates }) {
     }
 
     // open edit modal for a specific attendance record
-    function openEditModal(eventId, attendance) {
+    function openEditModal(eventId, attendanceDates) {
         setOpenEventId(eventId);
-        setEditingId(attendance.id);
-        editForm.setData("name", attendance.name || "");
+        setEditingId(attendanceDates.id);
+        editForm.setData("name", attendanceDates.name || "");
         editForm.setData(
             "datetime",
-            attendance.datetime ? attendance.datetime.split(" ")[1] : ""
+            attendanceDates.datetime
+                ? attendanceDates.datetime.split(" ")[1]
+                : ""
         ); // ensure HH:MM
         setShowEditModal(true);
     }
@@ -157,7 +159,9 @@ export default function Index({ events, attendanceDates }) {
                                                                     {ad.datetime
                                                                         ? new Date(
                                                                               ad.datetime
-                                                                          ).toLocaleString()
+                                                                          ).toLocaleString(
+                                                                              "id-ID"
+                                                                          )
                                                                         : "-"}
                                                                 </div>
                                                             </div>

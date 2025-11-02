@@ -29,14 +29,19 @@ class AttendanceController extends Controller
     {
         $user = Auth::user();
         $member = Member::with('user')->where('user_id', $user->id)->firstOrFail();
-        $attendanceDate = AttendanceDate::with('event')
-            ->whereHas('event.committee', function ($query) use ($member) {
+        $attendanceDate = AttendanceDate::with('attendance')
+            ->whereHas('attendance.committee', function ($query) use ($member) {
                 $query->where('member_id', $member->id);
-            })->get();
+            })->orderBy('datetime', 'asc')->get();
+        
+        $events = Event::whereHas('committee', function ($query) use ($member) {
+            $query->where('member_id', $member->id);
+        })->get();
 
         return Inertia::render('Member/Event/Index', [
             'attendanceDate' => $attendanceDate,
             'member' => $member,
+            'events' => $events,
         ]);
     }
 

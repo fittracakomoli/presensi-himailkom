@@ -23,7 +23,7 @@ class AttendanceDateController extends Controller
     public function index()
     {
         $events = Event::all();
-        $attendanceDates = AttendanceDate::all();
+        $attendanceDates = AttendanceDate::orderBy('datetime', 'asc')->get();
 
         return Inertia::render('Moderator/Attendance/Index', [
             'events' => $events,
@@ -105,7 +105,7 @@ class AttendanceDateController extends Controller
     {
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'date' => ['required', 'date'],
+            'datetime' => ['required', 'date'],
         ]);
 
         $event = Event::findOrFail($eventId);
@@ -115,7 +115,7 @@ class AttendanceDateController extends Controller
             ->firstOrFail();
 
         $attendance->name = $request->input('name');
-        $attendance->date = $request->input('date');
+        $attendance->datetime = $request->input('datetime');
         $attendance->save();
 
         return Redirect::route('moderator.attendance.index')
