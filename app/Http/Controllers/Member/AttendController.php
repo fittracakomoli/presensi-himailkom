@@ -21,7 +21,7 @@ class AttendController extends Controller
                 $query->where('user_id', $user->id);
             })->get();
 
-        return Inertia::render('Member/Attend/Attend', [
+        return Inertia::render('Member/Attend/Attendee', [
             'committee' => $committee,
         ]);
     }
