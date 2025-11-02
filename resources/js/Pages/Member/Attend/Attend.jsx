@@ -118,6 +118,7 @@ export default function Dashboard() {
 
             await html5QrCode.start(
                 cameraArg, // sekarang selalu ada argumen valid
+                { facingMode: "environment" },
                 { fps: 10, qrbox: 300 },
                 (decodedText /*, decodedResult */) => {
                     setLastResult(decodedText);
