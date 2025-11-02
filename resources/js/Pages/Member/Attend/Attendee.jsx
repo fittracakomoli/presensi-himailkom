@@ -68,7 +68,19 @@ export default function Dashboard() {
         }
     };
 
+    const stopScan = () => {
+        html5QrCode
+            .stop()
+            .then((ignore) => {
+                // QR Code scanning is stopped.
+            })
+            .catch((err) => {
+                // Stop failed, handle it.
+            });
+    };
+
     const onNewScanResult = (decodedText /*, decodedResult */) => {
+        stopScan();
         sendTokenToController(decodedText);
     };
 
