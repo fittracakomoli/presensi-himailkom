@@ -40,6 +40,7 @@ class Committee extends Model
             'keamanan' => 'Keamanan',
             'kreatif' => 'Kreatif',
             'pdd'   => 'PDD',
+            'ticketing'   => 'Ticketing',
         ];
 
         $key = strtolower($this->attributes['sie'] ?? '');

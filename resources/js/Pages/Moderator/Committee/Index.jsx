@@ -34,6 +34,7 @@ export default function Index({ events, committees, committeeCount, members }) {
         { value: "keamanan", label: "Keamanan" },
         { value: "kreatif", label: "Kreatif" },
         { value: "pdd", label: "PDD" },
+        { value: "ticketing", label: "Ticketing" },
     ];
 
     function openModal() {

@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('member_id')->constrained('members')->cascadeOnDelete();
             $table->foreignId('event_id')->constrained('events')->cascadeOnDelete();
-            $table->enum('sie', ['sc', 'ketua', 'sekretaris', 'bendahara', 'acara', 'humas', 'perkap', 'pdd', 'sponsor', 'konsumsi', 'keamanan', 'kreatif',]);
+            $table->enum('sie', ['sc', 'ketua', 'sekretaris', 'bendahara', 'acara', 'humas', 'perkap', 'pdd', 'sponsor', 'konsumsi', 'keamanan', 'kreatif', 'ticketing']);
             $table->timestamps();
         });
     }
